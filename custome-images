@@ -1,0 +1,43 @@
+# Use official RHEL UBI8 image
+FROM registry.access.redhat.com/ubi8/ubi
+
+# Install networking tools, SSSD, autofs, SSH
+RUN microdnf install -y \
+    iputils \
+    net-tools \
+    traceroute \
+    bind-utils \
+    nmap-ncat \
+    curl \
+    wget \
+    vim \
+    sssd \
+    sssd-tools \
+    autofs \
+    nfs-utils \
+    cifs-utils \
+    krb5-workstation \
+    oddjob \
+    oddjob-mkhomedir \
+    passwd \
+    openssh-server \
+    sudo \
+    && microdnf clean all
+
+# Setup SSH
+RUN mkdir -p /var/run/sshd && echo "root:redhat" | chpasswd
+
+# Permit root login and password auth
+RUN sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
+ && sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# Enable required services when running under systemd
+RUN systemctl enable sshd \
+ && systemctl enable sssd \
+ && systemctl enable autofs
+
+# Expose SSH port
+EXPOSE 22
+
+# Default command to run systemd (for containers needing services)
+CMD ["/usr/sbin/init"]
