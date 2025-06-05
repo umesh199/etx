@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  dockertest2:
+    image: redhat/ubi8  # Or your custom image
+    container_name: hqxsr-dockertest2
+    hostname: hqxsr-dockertest2
+    networks:
+      vlan932:
+        ipv4_address: 172.16.132.3
+    restart: always
+    tty: true
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+      - DAC_READ_SEARCH
+    devices:
+      - /dev/fuse
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+
+networks:
+  vlan932:
+    external: true
