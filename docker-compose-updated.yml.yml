@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  dockertest2:
+    image: redhat/ubi8
+    container_name: hqxsr-dockertest
+    hostname: hqxsr-dockertest2
+    networks:
+      vlan932:
+        ipv4_address: 172.16.132.2
+    restart: always
+    tty: true
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+      - DAC_READ_SEARCH
+    devices:
+      - /dev/fuse
+    volumes:
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+      - /etc/shadow:/etc/shadow:ro
+      - /etc/sssd:/etc/sssd:ro
+      - /etc/openldap:/etc/openldap:ro
+      - /etc/rsyslog.conf:/etc/rsyslog.conf:ro
+      - /etc/sysconfig/autofs:/etc/sysconfig/autofs:ro
+      - /etc/auto_user:/etc/auto_user:ro
+      - /etc/auto.master:/etc/auto.master:ro
+      - ./entrypoint.sh:/entrypoint.sh
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+    cpu_count: 2
+    mem_limit: 8192m
+
+networks:
+  vlan932:
+    external: true
